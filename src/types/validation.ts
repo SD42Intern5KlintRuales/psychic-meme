@@ -44,6 +44,7 @@ export interface FieldValidationSummary {
 export interface FileValidationResult {
     fileName: string;
     fileType?: string;
+    reviewerName?: string;
     status: string;
     valid: boolean;
     message?: string;

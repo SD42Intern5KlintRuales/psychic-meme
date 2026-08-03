@@ -14,9 +14,12 @@ import type { FileValidationResult } from "../types/validation";
 interface FileResultsProps {
     result: FileValidationResult;
     onReset: () => void;
+    onExportReviewRecord?: () => void;
+    isExporting?: boolean;
+    isDirectSync?: boolean;
 }
 
-const FileResults = ({ result, onReset }: FileResultsProps) => {
+const FileResults = ({ result, onReset, onExportReviewRecord, isExporting, isDirectSync }: FileResultsProps) => {
     const sheets = result.sheetValidations.sheetDetails || [];
     const [selectedSheetIndex, setSelectedSheetIndex] = useState(0);
     const [subTabIndex, setSubTabIndex] = useState(0);
@@ -32,9 +35,26 @@ const FileResults = ({ result, onReset }: FileResultsProps) => {
                     <h3 className="text-xl font-semibold text-slate-800">Detailed Results</h3>
                     <p className="text-sm text-slate-500 mt-1">Review validation details sheet by sheet.</p>
                 </div>
-                <Button variant="contained" color="primary" onClick={onReset}>
-                    Validate Another
-                </Button>
+                <div className="flex flex-wrap items-center gap-3">
+                    {onExportReviewRecord && (
+                        <Button
+                            variant="outlined"
+                            color="secondary"
+                            disabled={isExporting}
+                            onClick={onExportReviewRecord}
+                            className="border-purple-600 text-purple-700 hover:bg-purple-50"
+                        >
+                            {isExporting
+                                ? (isDirectSync ? "Saving File…" : "Processing…")
+                                : isDirectSync
+                                ? "Save to Local Review Record ⚡"
+                                : "Save Review Record (.xlsm)"}
+                        </Button>
+                    )}
+                    <Button variant="contained" color="primary" onClick={onReset}>
+                        Validate Another
+                    </Button>
+                </div>
             </div>
 
             <Accordion defaultExpanded={!result.valid} className="rounded-3xl border border-slate-200">

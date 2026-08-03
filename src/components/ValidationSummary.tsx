@@ -10,7 +10,15 @@ const ValidationSummary = ({ result }: ValidationSummaryProps) => {
 
     return (
         <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Validation Summary</h2>
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                <h2 className="text-xl font-semibold">Validation Summary</h2>
+                {result.reviewerName && (
+                    <div className="bg-indigo-50 border border-indigo-200 text-indigo-800 px-4 py-1.5 rounded-full text-sm font-medium flex items-center gap-2 shadow-xs">
+                        <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                        <span>Reviewer: <strong>{result.reviewerName}</strong></span>
+                    </div>
+                )}
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 <Card className="p-5 bg-white rounded-3xl shadow-sm">
