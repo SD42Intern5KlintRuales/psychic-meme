@@ -26,7 +26,7 @@ const UploadSection = ({
                 <div>
                     <h2 className="text-2xl font-semibold">Validate release documents</h2>
                     <p className="text-slate-600 mt-2 max-w-2xl">
-                        Upload one or more Excel workbooks and a validation rules JSON file in the same screen. Once the required files are ready, validate in batch.
+                        Upload Excel workbooks and a validation rules JSON file in the same screen. Once the required files are ready, validate in batch.
                     </p>
                 </div>
                 <Button
