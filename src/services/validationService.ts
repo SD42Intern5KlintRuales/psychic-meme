@@ -58,9 +58,23 @@ export async function exportReviewRecord(
         type: "application/vnd.ms-excel.sheet.macroEnabled.12"
     });
 
-    const targetFileName = templateFile
-        ? templateFile.name
-        : `ReviewRecord_${excelFile.name.substring(0, excelFile.name.lastIndexOf(".")) || excelFile.name}.xlsm`;
+    // Prefer server-provided filename from Content-Disposition header if present.
+    let serverFileName: string | undefined = undefined;
+    try {
+        const contentDisp = response.headers?.['content-disposition'] || response.headers?.['Content-Disposition'];
+        if (contentDisp) {
+            const match = /filename\*=UTF-8''([^;\n\r]+)|filename=\"?([^;\n\r\"]+)\"?/.exec(contentDisp);
+            if (match) {
+                serverFileName = decodeURIComponent(match[1] || match[2]);
+            }
+        }
+    } catch (e) {
+        // ignore parsing errors
+    }
+
+    const targetFileName = serverFileName
+        ? serverFileName
+        : (templateFile ? templateFile.name : 'ReviewRecord_SupportForSC066-12.xlsm');
 
     // Attempt Direct Disk Sync if a native FileSystemFileHandle is attached
     if (templateFileHandle) {
