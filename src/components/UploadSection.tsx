@@ -1,16 +1,12 @@
 import { Button, Card, TextField } from "@mui/material";
 import ExcelUploadBox from "./validation/ExcelUploadBox";
 import RulesUploadBox from "./validation/RulesUploadBox";
-import ReviewRecordUploadBox from "./validation/ReviewRecordUploadBox";
+// ReviewRecordUploadBox removed: server template used for Review Record generation
 import type { RulesUploadBoxProps } from "../types/validation";
 
 interface UploadSectionProps extends RulesUploadBoxProps {
     excelFile: File | null;
     setExcelFile: React.Dispatch<React.SetStateAction<File | null>>;
-    templateFile: File | null;
-    setTemplateFile: React.Dispatch<React.SetStateAction<File | null>>;
-    templateFileHandle: FileSystemFileHandle | null;
-    setTemplateFileHandle: React.Dispatch<React.SetStateAction<FileSystemFileHandle | null>>;
     reviewerName: string;
     setReviewerName: React.Dispatch<React.SetStateAction<string>>;
     onValidate: () => void;
@@ -24,10 +20,6 @@ const UploadSection = ({
     setExcelFile,
     rulesFile,
     setRulesFile,
-    templateFile,
-    setTemplateFile,
-    templateFileHandle,
-    setTemplateFileHandle,
     reviewerName,
     setReviewerName,
     onValidate,
@@ -75,15 +67,9 @@ const UploadSection = ({
                 />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ExcelUploadBox file={excelFile} setFile={setExcelFile} />
                 <RulesUploadBox rulesFile={rulesFile} setRulesFile={setRulesFile} />
-                <ReviewRecordUploadBox
-                    templateFile={templateFile}
-                    setTemplateFile={setTemplateFile}
-                    templateFileHandle={templateFileHandle}
-                    setTemplateFileHandle={setTemplateFileHandle}
-                />
             </div>
         </Card>
     );

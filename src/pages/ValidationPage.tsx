@@ -10,8 +10,6 @@ import { validateSingle, exportReviewRecord } from "../services/validationServic
 const ValidationPage = () => {
     const [excelFile, setExcelFile] = useState<File | null>(null);
     const [rulesFile, setRulesFile] = useState<File | null>(null);
-    const [templateFile, setTemplateFile] = useState<File | null>(null);
-    const [templateFileHandle, setTemplateFileHandle] = useState<FileSystemFileHandle | null>(null);
     const [reviewerName, setReviewerName] = useState<string>("");
     const [validationResult, setValidationResult] = useState<FileValidationResult | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -48,13 +46,7 @@ const ValidationPage = () => {
         setSuccessMessage(null);
 
         try {
-            const res = await exportReviewRecord(
-                excelFile,
-                rulesFile,
-                templateFile,
-                reviewerName,
-                templateFileHandle
-            );
+            const res = await exportReviewRecord(excelFile, rulesFile, undefined, reviewerName);
 
             if (res.isDirectSync) {
                 setSuccessMessage(`Review Record file '${res.fileName}' was updated directly on disk!`);
@@ -72,8 +64,7 @@ const ValidationPage = () => {
     const handleReset = () => {
         setExcelFile(null);
         setRulesFile(null);
-        setTemplateFile(null);
-        setTemplateFileHandle(null);
+        // template selection removed
         setReviewerName("");
         setValidationResult(null);
         setErrorMessage(null);
@@ -92,10 +83,6 @@ const ValidationPage = () => {
                     setExcelFile={setExcelFile}
                     rulesFile={rulesFile}
                     setRulesFile={setRulesFile}
-                    templateFile={templateFile}
-                    setTemplateFile={setTemplateFile}
-                    templateFileHandle={templateFileHandle}
-                    setTemplateFileHandle={setTemplateFileHandle}
                     reviewerName={reviewerName}
                     setReviewerName={setReviewerName}
                     onValidate={handleValidate}
@@ -130,7 +117,7 @@ const ValidationPage = () => {
                             onReset={handleReset}
                             onExportReviewRecord={handleExportReviewRecord}
                             isExporting={isExporting}
-                            isDirectSync={Boolean(templateFileHandle)}
+                            isDirectSync={false}
                         />
                     </>
                 )}
