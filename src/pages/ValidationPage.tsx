@@ -10,7 +10,10 @@ import { validateSingle, exportReviewRecord } from "../services/validationServic
 const ValidationPage = () => {
     const [excelFile, setExcelFile] = useState<File | null>(null);
     const [rulesFile, setRulesFile] = useState<File | null>(null);
-    const [validationResponse, setValidationResponse] = useState<ValidationResponse | null>(null);
+    const [templateFile, setTemplateFile] = useState<File | null>(null);
+    const [templateFileHandle, setTemplateFileHandle] = useState<FileSystemFileHandle | null>(null);
+    const [reviewerName, setReviewerName] = useState<string>("");
+    const [validationResult, setValidationResult] = useState<FileValidationResult | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -19,9 +22,7 @@ const ValidationPage = () => {
     const isReady = Boolean(excelFile) && Boolean(rulesFile);
 
     const handleValidate = async () => {
-        if (!isReady || !excelFile || !rulesFile) {
-            return;
-        }
+        if (!isReady || !excelFile || !rulesFile) return;
 
         setIsLoading(true);
         setErrorMessage(null);
@@ -29,8 +30,8 @@ const ValidationPage = () => {
         setValidationResult(null);
 
         try {
-            const json = await validateBatch(excelFiles, rulesFile);
-            setValidationResponse(json);
+            const result = await validateSingle(excelFile, rulesFile, reviewerName);
+            setValidationResult(result);
         } catch (error) {
             setErrorMessage("Validation failed to complete. Please try again.");
             console.error(error);
@@ -40,9 +41,7 @@ const ValidationPage = () => {
     };
 
     const handleExportReviewRecord = async () => {
-        if (!isReady || !excelFile || !rulesFile) {
-            return;
-        }
+        if (!isReady || !excelFile || !rulesFile) return;
 
         setIsExporting(true);
         setErrorMessage(null);
@@ -58,7 +57,7 @@ const ValidationPage = () => {
             );
 
             if (res.isDirectSync) {
-                setSuccessMessage(`⚡ Review Record file '${res.fileName}' was updated directly on disk!`);
+                setSuccessMessage(`Review Record file '${res.fileName}' was updated directly on disk!`);
             } else {
                 setSuccessMessage(`Downloaded updated Review Record '${res.fileName}'.`);
             }
@@ -93,6 +92,12 @@ const ValidationPage = () => {
                     setExcelFile={setExcelFile}
                     rulesFile={rulesFile}
                     setRulesFile={setRulesFile}
+                    templateFile={templateFile}
+                    setTemplateFile={setTemplateFile}
+                    templateFileHandle={templateFileHandle}
+                    setTemplateFileHandle={setTemplateFileHandle}
+                    reviewerName={reviewerName}
+                    setReviewerName={setReviewerName}
                     onValidate={handleValidate}
                     isLoading={isLoading}
                     isExporting={isExporting}
