@@ -6,6 +6,8 @@ import type { RulesUploadBoxProps } from "../types/validation";
 interface UploadSectionProps extends RulesUploadBoxProps {
     excelFiles: File[];
     setExcelFiles: React.Dispatch<React.SetStateAction<File[]>>;
+    reviewerName: string;
+    setReviewerName: React.Dispatch<React.SetStateAction<string>>;
     onValidate: () => void;
     isLoading: boolean;
     isReady: boolean;
@@ -16,6 +18,8 @@ const UploadSection = ({
     setExcelFiles,
     rulesFile,
     setRulesFile,
+    reviewerName,
+    setReviewerName,
     onValidate,
     isLoading,
     isReady
@@ -43,6 +47,15 @@ const UploadSection = ({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <ExcelUploadBox files={excelFiles} setFiles={setExcelFiles} />
                 <RulesUploadBox rulesFile={rulesFile} setRulesFile={setRulesFile} />
+            </div>
+            <div className="mt-6">
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Reviewer Name (optional)</label>
+                <input
+                    value={reviewerName}
+                    onChange={(e) => setReviewerName(e.target.value)}
+                    placeholder="Enter reviewer name"
+                    className="w-full p-2 border rounded-md bg-white"
+                />
             </div>
         </Card>
     );

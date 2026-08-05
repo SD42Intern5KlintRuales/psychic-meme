@@ -11,6 +11,7 @@ const ValidationPage = () => {
     const [excelFiles, setExcelFiles] = useState<File[]>([]);
     const [rulesFile, setRulesFile] = useState<File | null>(null);
     const [validationResponse, setValidationResponse] = useState<ValidationResponse | null>(null);
+    const [reviewerName, setReviewerName] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -26,7 +27,7 @@ const ValidationPage = () => {
         setValidationResponse(null);
 
         try {
-            const json = await validateBatch(excelFiles, rulesFile);
+            const json = await validateBatch(excelFiles, rulesFile, reviewerName);
             setValidationResponse(json);
         } catch (error) {
             setErrorMessage("Validation failed to complete. Please try again.");
@@ -54,6 +55,8 @@ const ValidationPage = () => {
                     setExcelFiles={setExcelFiles}
                     rulesFile={rulesFile}
                     setRulesFile={setRulesFile}
+                    reviewerName={reviewerName}
+                    setReviewerName={setReviewerName}
                     onValidate={handleValidate}
                     isLoading={isLoading}
                     isReady={isReady}
