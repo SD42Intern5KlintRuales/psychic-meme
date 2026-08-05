@@ -4,30 +4,32 @@ import Header from "../components/Header";
 import UploadSection from "../components/UploadSection";
 import ValidationSummary from "../components/ValidationSummary";
 import FileResults from "../components/FileResults";
-import type { ValidationResponse } from "../types/validation";
-import { validateBatch } from "../services/validationService";
+import type { FileValidationResult } from "../types/validation";
+import { validateSingle, exportReviewRecord } from "../services/validationService";
 
 const ValidationPage = () => {
-    const [excelFiles, setExcelFiles] = useState<File[]>([]);
+    const [excelFile, setExcelFile] = useState<File | null>(null);
     const [rulesFile, setRulesFile] = useState<File | null>(null);
     const [validationResponse, setValidationResponse] = useState<ValidationResponse | null>(null);
-    const [reviewerName, setReviewerName] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    const isReady = excelFiles.length > 0 && Boolean(rulesFile);
+    const isReady = Boolean(excelFile) && Boolean(rulesFile);
 
     const handleValidate = async () => {
-        if (!isReady || !rulesFile) {
+        if (!isReady || !excelFile || !rulesFile) {
             return;
         }
 
         setIsLoading(true);
         setErrorMessage(null);
-        setValidationResponse(null);
+        setSuccessMessage(null);
+        setValidationResult(null);
 
         try {
-            const json = await validateBatch(excelFiles, rulesFile, reviewerName);
+            const json = await validateBatch(excelFiles, rulesFile);
             setValidationResponse(json);
         } catch (error) {
             setErrorMessage("Validation failed to complete. Please try again.");
@@ -37,12 +39,48 @@ const ValidationPage = () => {
         }
     };
 
-    const handleReset = () => {
-        setExcelFiles([]);
-        setRulesFile(null);
-        setValidationResponse(null);
+    const handleExportReviewRecord = async () => {
+        if (!isReady || !excelFile || !rulesFile) {
+            return;
+        }
+
+        setIsExporting(true);
         setErrorMessage(null);
+        setSuccessMessage(null);
+
+        try {
+            const res = await exportReviewRecord(
+                excelFile,
+                rulesFile,
+                templateFile,
+                reviewerName,
+                templateFileHandle
+            );
+
+            if (res.isDirectSync) {
+                setSuccessMessage(`⚡ Review Record file '${res.fileName}' was updated directly on disk!`);
+            } else {
+                setSuccessMessage(`Downloaded updated Review Record '${res.fileName}'.`);
+            }
+        } catch (error) {
+            setErrorMessage("Failed to export/update Review Record file. Please check input files and try again.");
+            console.error(error);
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    const handleReset = () => {
+        setExcelFile(null);
+        setRulesFile(null);
+        setTemplateFile(null);
+        setTemplateFileHandle(null);
+        setReviewerName("");
+        setValidationResult(null);
+        setErrorMessage(null);
+        setSuccessMessage(null);
         setIsLoading(false);
+        setIsExporting(false);
     };
 
     return (
@@ -51,27 +89,44 @@ const ValidationPage = () => {
 
             <Container maxWidth="lg" className="pt-10 pb-10">
                 <UploadSection
-                    excelFiles={excelFiles}
-                    setExcelFiles={setExcelFiles}
+                    excelFile={excelFile}
+                    setExcelFile={setExcelFile}
                     rulesFile={rulesFile}
                     setRulesFile={setRulesFile}
-                    reviewerName={reviewerName}
-                    setReviewerName={setReviewerName}
                     onValidate={handleValidate}
                     isLoading={isLoading}
+                    isExporting={isExporting}
                     isReady={isReady}
                 />
 
+                {successMessage && (
+                    <div className="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800 font-semibold shadow-sm flex items-center justify-between">
+                        <span>{successMessage}</span>
+                        <button
+                            onClick={() => setSuccessMessage(null)}
+                            className="text-xs text-emerald-700 hover:text-emerald-900 font-bold"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                )}
+
                 {errorMessage && (
-                    <div className="mt-6 rounded-3xl border border-rose-200 bg-rose-50 p-4 text-rose-700">
+                    <div className="mt-6 rounded-3xl border border-rose-200 bg-rose-50 p-4 text-rose-700 font-semibold shadow-sm">
                         {errorMessage}
                     </div>
                 )}
 
-                {validationResponse && (
+                {validationResult && (
                     <>
-                        <ValidationSummary summary={validationResponse} />
-                        <FileResults validationResponse={validationResponse} onReset={handleReset} />
+                        <ValidationSummary result={validationResult} />
+                        <FileResults
+                            result={validationResult}
+                            onReset={handleReset}
+                            onExportReviewRecord={handleExportReviewRecord}
+                            isExporting={isExporting}
+                            isDirectSync={Boolean(templateFileHandle)}
+                        />
                     </>
                 )}
             </Container>

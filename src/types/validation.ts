@@ -1,8 +1,8 @@
 import type React from "react";
 
-export interface UploadBoxProps {
-    files: File[];
-    setFiles: React.Dispatch<React.SetStateAction<File[]>>;
+export interface ExcelUploadBoxProps {
+    file: File | null;
+    setFile: React.Dispatch<React.SetStateAction<File | null>>;
 }
 
 export interface RulesUploadBoxProps {
@@ -18,10 +18,20 @@ export interface ValidationErrorDetail {
     message: string;
 }
 
+export interface SheetValidationDetail {
+    sheetName: string;
+    status: string;
+    passedChecks: number;
+    failedChecks: number;
+    passedFields: ValidationErrorDetail[];
+    failedFields: ValidationErrorDetail[];
+}
+
 export interface SheetValidationSummary {
     sheetsChecked: number;
     presentSheets: string[];
     missingSheets: string[];
+    sheetDetails?: SheetValidationDetail[];
 }
 
 export interface FieldValidationSummary {
@@ -34,6 +44,7 @@ export interface FieldValidationSummary {
 export interface FileValidationResult {
     fileName: string;
     fileType?: string;
+    reviewerName?: string;
     status: string;
     valid: boolean;
     message?: string;
@@ -42,15 +53,4 @@ export interface FileValidationResult {
     failedChecks: number;
     sheetValidations: SheetValidationSummary;
     fieldValidations: FieldValidationSummary;
-}
-
-export interface ValidationResponse {
-    overallStatus: string;
-    totalChecks: number;
-    passedChecks: number;
-    failedChecks: number;
-    filesChecked: number;
-    passedFiles: number;
-    failedFiles: number;
-    results: FileValidationResult[];
 }
